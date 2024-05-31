@@ -16,7 +16,10 @@ class HomeRepository extends ChangeNotifier {
   }
 
   PageModel homePage = PageModel();
-  List<PageModel> categories = [];
+  List<PageModel> homeCategories = [];
+
+  PageModel cadastroUnicoProgramasSociaisPage = PageModel();
+  List<PageModel> cadastroUnicoProgramasSociaisArticles = [];
 
   Future<void> getHome() async {
     try {
@@ -30,33 +33,93 @@ class HomeRepository extends ChangeNotifier {
         var responseDecode = json.decode(response.body);
 
         homePage = PageModel.fromJson(responseDecode[0]);
+        homePage.categories = await getHomeCategories();
+
         log('getHome: Finish');
         notifyListeners();
-        await getCategories();
+
+        await getCadastroUnicoProgramasSociais();
+        // await getCadastroUnicoProgramasSociaisArtigos();
       }
     } catch (e) {
       Exception('Erro ao carregar os dados.');
     }
   }
 
-  Future<void> getCategories() async {
+  Future<List<PageModel>?> getHomeCategories() async {
     try {
-      log('getCategories: Initiating...');
+      log('getHomeCategories: Initiating...');
       final response = await http.get(
         Uri.parse('https://x8ki-letl-twmt.n7.xano.io/api:YGAulpxz/categories'),
       );
 
       if (response.statusCode == 200) {
-        log('getCategories: Request OK');
+        log('getHomeCategories: Request OK');
         var responseDecode = json.decode(response.body);
+
         responseDecode.forEach((element) {
-          categories.add(PageModel.fromJson(element));
+          homeCategories.add(PageModel.fromJson(element));
         });
-        log('getCategories: Finish');
+
+        log('getHomeCategories: Finish');
+        notifyListeners();
+
+        return homeCategories;
+      }
+    } catch (e) {
+      Exception('Erro ao carregar os dados.');
+    }
+    return null;
+  }
+
+  Future<void> getCadastroUnicoProgramasSociais() async {
+    try {
+      log('getCadastroUnicoProgramasSociais: Initiating...');
+      final response = await http.get(
+        Uri.parse(
+            'https://x8ki-letl-twmt.n7.xano.io/api:YGAulpxz/cadastro_unico_programas_sociais'),
+      );
+
+      if (response.statusCode == 200) {
+        log('getCadastroUnicoProgramasSociais: Request OK');
+        var responseDecode = json.decode(response.body);
+
+        cadastroUnicoProgramasSociaisPage =
+            PageModel.fromJson(responseDecode[0]);
+
+        cadastroUnicoProgramasSociaisPage.articles =
+            await getCadastroUnicoProgramasSociaisArtigos();
+
+        log('getCadastroUnicoProgramasSociais: Finish');
         notifyListeners();
       }
     } catch (e) {
       Exception('Erro ao carregar os dados.');
     }
+  }
+
+  Future<List<PageModel>?> getCadastroUnicoProgramasSociaisArtigos() async {
+    try {
+      log('getCadastroUnicoProgramasSociaisArtigos: Initiating...');
+      final response = await http.get(
+        Uri.parse(
+            'https://x8ki-letl-twmt.n7.xano.io/api:YGAulpxz/cadastro_unico_programas_sociais_artigos'),
+      );
+
+      if (response.statusCode == 200) {
+        log('getCadastroUnicoProgramasSociaisArtigos: Request OK');
+        var responseDecode = json.decode(response.body);
+        responseDecode.forEach((element) {
+          cadastroUnicoProgramasSociaisArticles
+              .add(PageModel.fromJson(element));
+        });
+        log('getCadastroUnicoProgramasSociaisArtigos: Finish');
+        notifyListeners();
+        return cadastroUnicoProgramasSociaisArticles;
+      }
+    } catch (e) {
+      Exception('Erro ao carregar os dados.');
+    }
+    return null;
   }
 }

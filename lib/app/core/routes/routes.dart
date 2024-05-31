@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:template_app/app/modules/home/pages/home_page.dart';
 import 'package:template_app/app/modules/home/pages/loading_page.dart';
@@ -15,17 +16,56 @@ final routes = GoRouter(
       },
     ),
     GoRoute(
-      path: '/:path',
+      path: '/home',
       builder: (context, state) {
-        switch (state.pathParameters['path']) {
-          case 'home':
-            return HomePage(pageModel: homeRepository.homePage);
-          case 'bolsa_familia':
-            return HomePage(pageModel: homeRepository.categories[0]);
-          case 'cadastro_unico':
-            return HomePage(pageModel: homeRepository.categories[1]);
+        return HomePage(
+          pageModel: homeRepository.homePage,
+        );
+      },
+    ),
+    GoRoute(
+      path: '/home/:category',
+      builder: (context, state) {
+        switch (state.pathParameters['category']) {
+          case 'bolsaFamilia':
+            return HomePage(
+              pageModel: homeRepository.homeCategories[0],
+            );
+          case 'cadastroUnico':
+            return HomePage(
+              pageModel: homeRepository.homeCategories[1],
+            );
+
           default:
-            return HomePage(pageModel: homeRepository.homePage);
+            return HomePage(
+              pageModel: homeRepository.homePage,
+            );
+        }
+      },
+    ),
+    GoRoute(
+      path: '/home/:category/:article',
+      builder: (context, state) {
+        switch (state.pathParameters['category']) {
+          case 'bolsaFamilia':
+            return HomePage(
+              pageModel: homeRepository.homeCategories[0],
+            );
+          case 'cadastroUnico':
+            switch (state.pathParameters['article']) {
+              case 'programasSociais':
+                return HomePage(
+                  pageModel: homeRepository.cadastroUnicoProgramasSociaisPage,
+                );
+            }
+            return HomePage(
+              pageModel: homeRepository.homeCategories[1],
+            );
+
+          default:
+            return HomePage(
+              pageModel: homeRepository.homePage,
+            );
         }
       },
     ),
